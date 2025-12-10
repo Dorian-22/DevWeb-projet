@@ -18,21 +18,53 @@ const categoriesController = {
     try {
       const { name, description } = req.body;
 
-      const category = await Category.create({
-        name,
-        description,
-      });
+      if (!name) {
+        return res.status(400).json({ error: 'Name is required' });
+      }
 
+      const category = await Category.create({ name, description });
       res.status(201).json(category);
     } catch (error) {
       console.error('Error creating category:', error);
-      if (error.name === 'SequelizeUniqueConstraintError') {
-        return res.status(400).json({
-        error: 'A category with this name already exists',
-        });
+      res.status(500).json({ error: 'Failed to create category' });
+    }
+  },
+
+  async update(req, res) {
+    try {
+      const { id } = req.params;
+      const { name, description } = req.body;
+
+      const category = await Category.findByPk(id);
+
+      if (!category) {
+        return res.status(404).json({ error: 'Category not found' });
       }
 
-      res.status(500).json({ error: 'Failed to create category' });
+      await category.update({ name, description });
+
+      res.json(category);
+    } catch (error) {
+      console.error('Error updating category:', error);
+      res.status(500).json({ error: 'Failed to update category' });
+    }
+  },
+
+  async remove(req, res) {
+    try {
+      const { id } = req.params;
+
+      const category = await Category.findByPk(id);
+
+      if (!category) {
+        return res.status(404).json({ error: 'Category not found' });
+      }
+
+      await category.destroy();
+      res.status(204).send();
+    } catch (error) {
+      console.error('Error deleting category:', error);
+      res.status(500).json({ error: 'Failed to delete category' });
     }
   },
 };

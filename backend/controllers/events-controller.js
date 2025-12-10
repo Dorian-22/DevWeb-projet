@@ -51,6 +51,27 @@ const eventsController = {
         locationId,
       } = req.body;
 
+    
+      if (!title || !startDate || !categoryId || !locationId) {
+        return res.status(400).json({
+          error: 'title, startDate, categoryId and locationId are required',
+        });
+      }
+
+      // Optionnel : vérifier que categoryId & locationId existent
+      const [category, location] = await Promise.all([
+        Category.findByPk(categoryId),
+        Location.findByPk(locationId),
+      ]);
+
+      if (!category) {
+        return res.status(400).json({ error: 'Invalid categoryId' });
+      }
+
+      if (!location) {
+        return res.status(400).json({ error: 'Invalid locationId' });
+      }
+
       const event = await Event.create({
         title,
         description,
@@ -87,6 +108,20 @@ const eventsController = {
 
       if (!event) {
         return res.status(404).json({ error: 'Event not found' });
+      }
+      
+      if (categoryId) {
+        const category = await Category.findByPk(categoryId);
+        if (!category) {
+          return res.status(400).json({ error: 'Invalid categoryId' });
+        }
+      }
+
+      if (locationId) {
+        const location = await Location.findByPk(locationId);
+        if (!location) {
+          return res.status(400).json({ error: 'Invalid locationId' });
+        }
       }
 
       await event.update({

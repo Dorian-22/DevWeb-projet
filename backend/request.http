@@ -1,11 +1,51 @@
 # Delete event
 DELETE http://localhost:3000/events/2
 
+
+### supprimer event admin
+DELETE http://localhost:3000/admin/events/3
+
 ### Ping API
 GET http://localhost:3000/
 
-### Liste des événements
+
+### Détail d'un évenement
+GET http://localhost:3000/events/3
+
+
+### créer catégories admin
+POST http://localhost:3000/admin/categories
+Content-Type: application/json
+
+{
+  "name": "discours",
+  "description": "Événements de type conférence"
+}
+
+
+### Créer location admin
+POST http://localhost:3000/admin/locations
+Content-Type: application/json
+
+{
+  "name": "Amphi A",
+  "address": "10 rue des Fleurs",
+  "city": "Paris",
+  "capacity": 120
+}
+
+
+### liste des catégories 
+GET http://localhost:3000/categories
+
+### Liste des événements publiques
 GET http://localhost:3000/events
+
+
+### liste des lieux 
+GET http://localhost:3000/locations
+
+
 
 ### Créer une catégorie
 POST http://localhost:3000/categories
@@ -15,6 +55,12 @@ Content-Type: application/json
   "name": "Atelier",
   "description": "Événements de type atelier"
 }
+
+
+
+
+
+
 
 ### Créer un lieu
 POST http://localhost:3000/locations
@@ -43,5 +89,50 @@ Content-Type: application/json
 }
 
 
+### création evenements admin 
+POST http://localhost:3000/admin/events
+Content-Type: application/json
+
+{
+  "title": "Soirée Networking",
+  "description": "Rencontre étudiants / pros",
+  "startDate": "2025-01-15T18:00:00.000Z",
+  "endDate": "2025-01-15T21:00:00.000Z",
+  "capacity": 50,
+  "status": "published",
+  "categoryId": 1,
+  "locationId": 1
+}
 
 
+
+
+### mettre à jour un event admin
+PUT http://localhost:3000/admin/events/3
+Content-Type: application/json
+
+{
+  "title": "Soirée Networking ESILV",
+  "status": "draft"
+}
+
+
+
+### création sans champs obligatoire admin
+POST http://localhost:3000/admin/events
+Content-Type: application/json
+
+{
+  "title": "Événement mauvais",
+  "startDate": "2025-01-15T18:00:00.000Z",
+  "categoryId": 999,
+  "locationId": 1
+}
+
+
+### modif id inexistant
+PUT http://localhost:3000/admin/events/9999
+
+
+### supprimer id inexistant
+DELETE http://localhost:3000/admin/events/9999
