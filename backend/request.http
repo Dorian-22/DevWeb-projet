@@ -1,0 +1,47 @@
+# Delete event
+DELETE http://localhost:3000/events/2
+
+### Ping API
+GET http://localhost:3000/
+
+### Liste des événements
+GET http://localhost:3000/events
+
+### Créer une catégorie
+POST http://localhost:3000/categories
+Content-Type: application/json
+
+{
+  "name": "Atelier",
+  "description": "Événements de type atelier"
+}
+
+### Créer un lieu
+POST http://localhost:3000/locations
+Content-Type: application/json
+
+{
+  "name": "Salle A",
+  "address": "123 rue de Paris",
+  "city": "Paris",
+  "capacity": 100
+}
+
+### Créer un événement
+POST http://localhost:3000/events
+Content-Type: application/json
+
+{
+  "title": "Soirée Networking",
+  "description": "Rencontre étudiants / pros",
+  "startDate": "2025-01-15T18:00:00.000Z",
+  "endDate": "2025-01-15T21:00:00.000Z",
+  "capacity": 50,
+  "status": "published",
+  "categoryId": 1,
+  "locationId": 1
+}
+
+
+
+
