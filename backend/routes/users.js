@@ -1,29 +1,33 @@
 const { Router } = require("express");
 const UserController = require("../controllers/users");
-const checkAuth = require("../middlwares/check-auth");
-const checkRole = require("../middlwares/check-role");
+const checkAuth = require("../middlewares/checkAuth");
+const checkRole = require("../middlewares/checkRole");
+
 const router = Router();
 
-router.get("/users", checkAuth, checkRole(["ADMIN"]), UserController.cget);
-
-router.post("/users", checkAuth, checkRole(["ADMIN"]), UserController.create);
-
+router.get(
+  "/users",
+  checkAuth,
+  checkRole({ role: "ADMIN" }),
+  UserController.cget
+);
+router.post("/users", checkRole({ role: "ADMIN" }), UserController.create);
 router.get(
   "/users/:id",
   checkAuth,
-  checkRole(["ADMIN", "USER"]),
+  checkRole({ role: "ADMIN", selfAccess: true }),
   UserController.get
 );
 router.patch(
   "/users/:id",
   checkAuth,
-  checkRole(["ADMIN", "USER"]),
-  UserController.patch
+  checkRole({ role: "ADMIN", selfAccess: true }),
+  UserController.update
 );
 router.delete(
   "/users/:id",
   checkAuth,
-  checkRole(["ADMIN", "USER"]),
+  checkRole({ role: "ADMIN", selfAccess: true }),
   UserController.delete
 );
 

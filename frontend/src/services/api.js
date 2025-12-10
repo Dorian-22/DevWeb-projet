@@ -1,19 +1,17 @@
-const API_URL = "http://localhost:3000";
-
+const baseUrl = "http://localhost:3000";
 export default function api(pathOrEndpoint, options = {}) {
-  let defaultHeaders = {
+  const defaultHeaders = {
     "Content-Type": "application/json",
   };
-  const token = localStorage.getItem("token");
-  if (token) {
-    defaultHeaders["Authorization"] = `Bearer ${token}`;
+  if (localStorage.getItem("token")) {
+    defaultHeaders["Authorization"] = `Bearer ${localStorage.getItem("token")}`;
   }
-  options = {
-    ...options,
-    headers: {
-      ...defaultHeaders,
-      ...options.headers,
-    },
+  options.headers = {
+    ...defaultHeaders,
+    ...options.headers,
   };
-  return fetch(`${API_URL}${pathOrEndpoint}`, options);
+  if (options.body && typeof options.body === "object") {
+    options.body = JSON.stringify(options.body);
+  }
+  return fetch(`${baseUrl}${pathOrEndpoint}`, options);
 }

@@ -1,3 +1,4 @@
+
 const User = require("../models/users");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -5,13 +6,11 @@ const jwt = require("jsonwebtoken");
 module.exports = {
   login: async (req, res, next) => {
     const { email, password } = req.body;
-
     const user = await User.findOne({
       where: {
         email,
       },
     });
-
     if (!user) {
       return res.sendStatus(401);
     }
@@ -20,12 +19,13 @@ module.exports = {
       return res.sendStatus(401);
     }
 
-    return res.json({
+    res.json({
       token: jwt.sign(
         {
           user_id: user.id,
+          name: user.name,
         },
-        process.env.JWT_SECRET ?? "MYStrongSecret"
+        process.env.JWT_SECRET
       ),
     });
   },

@@ -1,20 +1,30 @@
 const { DataTypes, Model } = require("sequelize");
-const { connection } = require("../lib/db");
 const bcrypt = require("bcrypt");
+const { connection } = require("../lib/db");
 
 class User extends Model {}
 
 User.init(
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
-      autoIncrement: true,
     },
-    login: {
+    name: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
+    },
+    age: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    role: {
+      type: DataTypes.STRING,
+      defaultValue: "USER",
+      validate: {
+        isIn: [["ADMIN", "USER"]],
+      },
     },
     email: {
       type: DataTypes.STRING,
@@ -28,15 +38,7 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
-        // is: /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\dA-Za-z]).{8,32}/,
-      },
-    },
-    role: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      defaultValue: "USER",
-      validate: {
-        isIn: [["ADMIN", "USER"]],
+        // is: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\dA-Za-z]).{8,32}$/,
       },
     },
   },
@@ -50,15 +52,15 @@ User.init(
 User.addHook("beforeCreate", async (instance) => {
   instance.password = await bcrypt.hash(
     instance.password,
-    await bcrypt.genSalt()
+    await bcrypt.genSalt(10)
   );
 });
 
-User.addHook("beforeUpdate", async (instance, options) => {
-  if (options.fields.includes("password")) {
+User.addHook("beforeUpdate", async (instance, { fields }) => {
+  if (fields.includes("password")) {
     instance.password = await bcrypt.hash(
       instance.password,
-      await bcrypt.genSalt()
+      await bcrypt.genSalt(10)
     );
   }
 });

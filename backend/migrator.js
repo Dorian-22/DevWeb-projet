@@ -1,20 +1,23 @@
-const { getConnection } = require("./lib/db");
+const { startDB } = require("./lib/db");
 
-getConnection()
+startDB()
   .then(async (connection) => {
-    // Get all defined models
+    console.log("Migrator connected to the database");
+    // Import models to ensure they are registered with Sequelize
     require("./models/users");
-    return connection;
-  })
-  .then((connection) =>
-    connection.sync({
+    require("./models/articles");
+    // ADD OTHER MODELS HERE
+    // ...
+
+    // Synchronize all defined models to the DB
+    await connection.sync({
       alter: true,
-    })
-  )
-  .then((connection) => connection.close())
-  .then(() => {
-    console.log("All models were synchronized successfully.");
+    });
+    console.log("Database synchronized");
+    await connection.close();
+    console.log("Migrator disconnected from the database");
   })
-  .catch((error) => {
-    console.error("Unable to connect to the database:", error);
+  .catch((err) => {
+    console.error("Unable to connect to the database:", err);
+    process.exit(1);
   });

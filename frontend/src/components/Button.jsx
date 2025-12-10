@@ -1,43 +1,41 @@
 export default function Button({
-  component: Component = "button",
-  title,
   onClick,
+  title,
   style,
   variant,
-  ...rest
+  component: Component = "button",
+  children,
+  ...otherProps
 }) {
-  function handleClick(event) {
-    onClick?.(event);
+  function handleClick(e) {
+    onClick?.(e);
   }
+
   const defaultStyle = {
+    backgroundColor: "blue",
+    color: "red",
+    borderRadius: 30,
+    padding: 10,
+    border: "1px green dashed",
     ...(style ?? {}),
   };
 
   switch (variant) {
-    case "delete":
-      defaultStyle.backgroundColor = "red";
-      break;
     case "icon":
       defaultStyle.borderRadius = "50%";
-      defaultStyle.width = "50px";
-      defaultStyle.minWidth = "50px";
-      defaultStyle.maxWidth = "50px";
-      defaultStyle.height = "50px";
-      defaultStyle.minHeight = "50px";
-      defaultStyle.maxHeight = "50px";
+      defaultStyle.width = 50;
+      defaultStyle.height = 50;
       defaultStyle.overflow = "hidden";
       title = title.slice(0, 1);
-      break;
   }
+
+  if (Component !== "input") {
+    otherProps.children = title ?? children;
+  } else {
+    otherProps.value = title ?? children;
+  }
+
   return (
-    <Component
-      className="button"
-      onClick={handleClick}
-      style={defaultStyle}
-      {...rest}
-      value={Component === "input" ? title : undefined}
-    >
-      {Component !== "input" ? title : undefined}
-    </Component>
+    <Component onClick={handleClick} style={defaultStyle} {...otherProps} />
   );
 }

@@ -1,13 +1,13 @@
-module.exports = function checkRole(allowedRoles) {
-  return (req, res, next) => {
-    if (!req.user) {
+module.exports = function ({ role, selfAccess = false } = {}) {
+  return async (req, res, next) => {
+    if (selfAccess && req.user.id === req.params.id) {
+      return next();
+    }
+
+    if (role !== req.user.role) {
       return res.sendStatus(403);
     }
 
-    if (allowedRoles.includes(req.user.role)) {
-      next();
-    } else {
-      return res.sendStatus(403);
-    }
+    next();
   };
 };
