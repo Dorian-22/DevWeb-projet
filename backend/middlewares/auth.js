@@ -11,7 +11,7 @@ function requireAuth(req, res, next) {
   // Pour l'instant, on simule un user connecté :
   req.user = {
     id: 1,
-    role: 'USER', // change en 'USER' pour tester les refus
+    role: 'ADMIN', // change en 'USER' pour tester les refus
   };
   next();
 }

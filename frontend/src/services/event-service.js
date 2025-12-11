@@ -29,3 +29,53 @@ export async function fetchEventById(id) {
   const response = await fetch(`${API_URL}/events/${id}`);
   return handleResponse(response);
 }
+
+
+// plus tard :  vrai token JWT
+function getAuthHeaders() {
+  return {
+    // Exemple: Authorization: `Bearer ${localStorage.getItem('token')}`,
+    'Content-Type': 'application/json',
+  };
+}
+
+export async function adminCreateEvent(payload) {
+  const response = await fetch(`${API_URL}/admin/events`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(payload),
+  });
+  return handleResponse(response);
+}
+
+export async function adminUpdateEvent(id, payload) {
+  const response = await fetch(`${API_URL}/admin/events/${id}`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(payload),
+  });
+  return handleResponse(response);
+}
+
+export async function adminDeleteEvent(id) {
+  const response = await fetch(`${API_URL}/admin/events/${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
+
+  // DELETE 204 => pas de JSON à parser
+  if (!response.ok) {
+    let errorMessage = 'Request failed';
+    try {
+      const data = await response.json();
+      if (data && data.error) {
+        errorMessage = data.error;
+      }
+    } catch (_) {}
+    const error = new Error(errorMessage);
+    error.status = response.status;
+    throw error;
+  }
+
+  return true;
+}
