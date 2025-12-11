@@ -1,8 +1,11 @@
 // src/App.jsx
 import { Routes, Route, Link, Navigate } from 'react-router-dom';
+import "./App.css"
 import EventsList from './views/events/EventsList.jsx';
 import EventDetails from './views/events/EventDetails.jsx';
 import AdminEventForm from './views/admin/AdminEventForm.jsx';
+import RegisterForm from "./views/registerForm.jsx";
+import LoginForm from "./views/loginForm.jsx";
 
 function App() {
   return (
@@ -12,6 +15,19 @@ function App() {
           <Link to="/events">Événements</Link>
           {/* plus tard: conditionner ce lien à role === ADMIN */}
           <Link to="/admin/events/new">Créer un événement</Link>
+          {!user && (
+          <p>
+            <LoginForm setUser={setUser} />
+            <RegisterForm />
+            Edit <code>src/App.jsx</code> and save to test HMR
+          </p>
+        )}
+        {user && (
+          <>
+            <p>Connected as {user.name}</p>
+            <ArticleList />
+          </>
+        )}
         </nav>
       </header>
 
