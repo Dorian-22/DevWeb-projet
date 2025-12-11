@@ -14,6 +14,10 @@ const adminLocationsRouter = require('./routes/admin-locations');
 
 const { requireAuth, requireAdmin } = require('./middlewares/auth');
 
+
+const usersRouter = require('./routes/users');
+const securityRouter = require('./routes/security');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
