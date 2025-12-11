@@ -1,37 +1,33 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+// src/App.jsx
+import { Routes, Route, Link, Navigate } from 'react-router-dom';
+import EventsList from './views/events/EventsList.jsx';
+import EventDetails from './views/events/EventDetails.jsx';
+import AdminEventForm from './views/admin/AdminEventForm.jsx';
 
-import Header from './components/Header';   // ← AJOUT ICI
-
-import Login from './pages/Login';
-import Register from './pages/Register';
-import ProtectedRoute from './components/ProtectedRoute';
-import AdminPage from './pages/AdminPage';
-import Home from './pages/Home';
-
-export default function App() {
+function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
+    <div style={{ maxWidth: '900px', margin: '0 auto', padding: '16px' }}>
+      <header style={{ marginBottom: '24px' }}>
+        <nav style={{ display: 'flex', gap: '12px' }}>
+          <Link to="/events">Événements</Link>
+          {/* plus tard: conditionner ce lien à role === ADMIN */}
+          <Link to="/admin/events/new">Créer un événement</Link>
+        </nav>
+      </header>
 
-        {/* ⭐ Le Header doit être ici */}
-        <Header />
-
+      <main>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          <Route path="/" element={<Navigate to="/events" replace />} />
+          <Route path="/events" element={<EventsList />} />
+          <Route path="/events/:id" element={<EventDetails />} />
 
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute role="ADMIN">
-                <AdminPage />
-              </ProtectedRoute>
-            }
-          />
+          {/* Routes admin */}
+          <Route path="/admin/events/new" element={<AdminEventForm />} />
+          <Route path="/admin/events/:id/edit" element={<AdminEventForm />} />
         </Routes>
-      </AuthProvider>
-    </BrowserRouter>
+      </main>
+    </div>
   );
 }
+
+export default App;
