@@ -1,14 +1,15 @@
-
 const { sequelize } = require('../lib/db');
 
 const defineCategory = require('./category');
 const defineLocation = require('./location');
 const defineEvent = require('./event');
+const defineUser = require('/users')
 
 // Définition des modèles
 const Category = defineCategory(sequelize);
 const Location = defineLocation(sequelize);
 const Event = defineEvent(sequelize);
+const User = defineUser(sequelize);
 
 // Associations
 Category.hasMany(Event, {
@@ -53,6 +54,7 @@ async function syncModels() {
 
 module.exports = {
   sequelize,
+  User,
   Category,
   Location,
   Event,

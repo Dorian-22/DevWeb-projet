@@ -15,8 +15,7 @@ const adminLocationsRouter = require('./routes/admin-locations');
 const { requireAuth, requireAdmin } = require('./middlewares/auth');
 
 
-const usersRouter = require('./routes/users');
-const securityRouter = require('./routes/security');
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -28,6 +27,7 @@ app.use(express.json());
 app.use('/events', eventsRouter);
 app.use('/categories', categoriesRouter);
 app.use('/locations', locationsRouter);
+
 
 // Routes admin
 app.use('/admin/events', requireAuth, requireAdmin, adminEventsRouter);

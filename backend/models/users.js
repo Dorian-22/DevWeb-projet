@@ -15,10 +15,6 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    age: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
     role: {
       type: DataTypes.STRING,
       defaultValue: "USER",

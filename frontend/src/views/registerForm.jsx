@@ -1,0 +1,47 @@
+import { useState } from "react";
+
+export default function RegisterForm() {
+  const [registerSucceeded, setRegisterSucceeded] = useState(false);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const values = {
+      name: event.target.name.value,
+      age: event.target.age.value,
+      email: event.target.email.value,
+      password: event.target.password.value,
+    };
+
+    console.log("Registering user with values:", values);
+
+    const response = await fetch("http://localhost:3000/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(values),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log("Registration successful:", data);
+      setRegisterSucceeded(true);
+      event.target.reset();
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <label>Name</label>
+      <input type="text" name="name" />
+      <label>Email</label>
+      <input type="email" name="email" />
+      <label>Password</label>
+      <input type="password" name="password" />
+      <button type="submit">Register</button>
+      {registerSucceeded && (
+        <p style={{ color: "green" }}>Registration successful !</p>
+      )}
+    </form>
+  );
+}
