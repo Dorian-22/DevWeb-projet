@@ -1,62 +1,51 @@
 // backend/controllers/auth-controller.js
-const User = require("../models/users");
+const { User } = require('../models');
 const bcrypt = require('bcrypt');
 const jwt = require('../lib/jwt');
 
 module.exports = {
-  register: async (req, res, next) => {
+  register: async (req, res) => {
     try {
-      const { email, password, username, firstName, lastName } = req.body;
+      const { email, password, firstName, lastName } = req.body;
 
-      // Validation basique
       if (!email || !password) {
         return res.status(400).json({ error: 'Email et mot de passe requis' });
       }
 
-      // Vérifier si l'email existe déjà
       const existingUser = await User.findOne({ where: { email } });
       if (existingUser) {
-        return res.status(400).json({ 
-          error: 'Un utilisateur avec cet email existe déjà' 
-        });
+        return res.status(400).json({ error: 'Email déjà utilisé' });
       }
 
-      // Hasher le mot de passe
-      const hashedPassword = await bcrypt.hash(password, 10);
+      const passwordHash = await bcrypt.hash(password, 10);
 
-      // Créer l'utilisateur
       const user = await User.create({
         email,
-        password: hashedPassword,
-        username: username || email.split('@')[0], // Si pas de username, utilise la partie avant @
-        firstName: firstName || null,
-        lastName: lastName || null,
-        role: 'USER' // Note : majuscules comme dans ton middleware
+        passwordHash,
+        firstName,
+        lastName,
+        role: 'USER'
       });
 
-      // Générer le token JWT
-      const token = jwt.generateToken({
+      const token = jwt.signPayload({
         id: user.id,
         email: user.email,
         role: user.role
       });
 
-      // Retourner les infos utilisateur (sans mot de passe)
-      const userResponse = user.toJSON ? user.toJSON() : user;
-      delete userResponse.password;
-
       res.status(201).json({
         message: 'Utilisateur créé avec succès',
-        user: userResponse,
+        user,
         token
       });
 
     } catch (error) {
-      next(error);
+      console.error('Erreur inscription:', error);
+      res.status(500).json({ error: 'Erreur lors de l\'inscription' });
     }
   },
 
-  login: async (req, res, next) => {
+  login: async (req, res) => {
     try {
       const { email, password } = req.body;
 
@@ -64,32 +53,24 @@ module.exports = {
         return res.status(400).json({ error: 'Email et mot de passe requis' });
       }
 
-      // Trouver l'utilisateur par email
-      const user = await User.findOne({ where: { email } });
+      const user = await User.scope('withPassword').findOne({ where: { email } });
       if (!user) {
-        return res.status(401).json({ 
-          error: 'Email ou mot de passe incorrect' 
-        });
+        return res.status(401).json({ error: 'Identifiants incorrects' });
       }
 
-      // Vérifier le mot de passe
-      const isValidPassword = await bcrypt.compare(password, user.password);
-      if (!isValidPassword) {
-        return res.status(401).json({ 
-          error: 'Email ou mot de passe incorrect' 
-        });
+      const isValid = await bcrypt.compare(password, user.passwordHash);
+      if (!isValid) {
+        return res.status(401).json({ error: 'Identifiants incorrects' });
       }
 
-      // Générer le token JWT
-      const token = jwt.generateToken({
+      const token = jwt.signPayload({
         id: user.id,
         email: user.email,
         role: user.role
       });
 
-      // Retourner les infos utilisateur (sans mot de passe)
-      const userResponse = user.toJSON ? user.toJSON() : user;
-      delete userResponse.password;
+      const userResponse = user.get({ plain: true });
+      delete userResponse.passwordHash;
 
       res.json({
         message: 'Connexion réussie',
@@ -98,18 +79,26 @@ module.exports = {
       });
 
     } catch (error) {
-      next(error);
+      console.error('Erreur connexion:', error);
+      res.status(500).json({ error: 'Erreur lors de la connexion' });
     }
   },
 
-  // GET /auth/me - utilise le middleware requireAuth
-  me: async (req, res, next) => {
+  me: async (req, res) => {
     try {
-      // req.user est déjà défini par le middleware requireAuth
-      // Il contient l'utilisateur complet (sans mot de passe)
-      res.json({ user: req.user });
+      if (!req.user) {
+        return res.status(401).json({ error: 'Non authentifié' });
+      }
+
+      const user = await User.findByPk(req.user.id);
+      if (!user) {
+        return res.status(404).json({ error: 'Utilisateur non trouvé' });
+      }
+
+      res.json({ user });
     } catch (error) {
-      next(error);
+      console.error('Erreur récupération profil:', error);
+      res.status(500).json({ error: 'Erreur serveur' });
     }
   }
 };

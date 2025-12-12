@@ -4,7 +4,7 @@ startDB()
   .then(async (connection) => {
     console.log("Migrator connected to the database");
     // Import models to ensure they are registered with Sequelize
-    require("./models/users");
+    require("./models/user");
     require("./models/event");
     require("./models/category");
     // ADD OTHER MODELS HERE
