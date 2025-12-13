@@ -10,7 +10,7 @@ async function handleResponse(response) {
         errorMessage = data.error;
       }
     } catch (_) {
-      // ignore JSON parse error
+     
     }
     const error = new Error(errorMessage);
     error.status = response.status;
@@ -29,7 +29,7 @@ export async function fetchEventById(id) {
   return handleResponse(response);
 }
 
-// MAINTENANT : vrai token JWT
+
 function getAuthHeaders() {
   const token = localStorage.getItem('token');
   const headers = {

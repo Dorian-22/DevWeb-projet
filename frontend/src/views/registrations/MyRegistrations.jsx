@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import GenericTable from '../../components/GenericTable';
-import { fetchMyRegistrations } from '../../services/registration-service';
+
+import { fetchMyRegistrations, unregisterFromEvent } from '../../services/registration-service';
+
 
 function MyRegistrations() {
   const [registrations, setRegistrations] = useState([]);
@@ -26,6 +28,21 @@ function MyRegistrations() {
     }
     load();
   }, []);
+  async function handleUnregister(reg) {
+    if (!reg.event?.id) return;
+
+    const confirm = window.confirm("Se désinscrire de cet événement ?");
+    if (!confirm) return;
+
+    try {
+        await unregisterFromEvent(reg.event.id);
+        // refresh list
+        const data = await fetchMyRegistrations();
+        setRegistrations(data);
+    } catch (err) {
+        setError(err.message || "Impossible de se désinscrire");
+    }
+  }
 
   if (loading) return <p>Chargement de tes inscriptions...</p>;
   if (error) return <p style={{ color: 'red' }}>Erreur : {error}</p>;
@@ -67,12 +84,25 @@ function MyRegistrations() {
         columns={columns}
         data={registrations}
         getRowId={(r) => r.id}
-        onRowClick={(r) => {
-          if (r.event?.id) navigate(`/events/${r.event.id}`);
-        }}
+        onRowClick={(r) => r.event?.id && navigate(`/events/${r.event.id}`)}
+        actions={(r) =>
+            r.status === 'REGISTERED' ? (
+                <button type="button" onClick={() => handleUnregister(r)}>
+                    Se désinscrire
+                </button>
+            ) : (
+                <span style={{ opacity: 0.7 }}>—</span>
+            )
+        }
       />
     </div>
   );
 }
+
+
+
+
+
+
 
 export default MyRegistrations;

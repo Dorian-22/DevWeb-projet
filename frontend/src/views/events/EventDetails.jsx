@@ -4,8 +4,7 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { fetchEventById, adminDeleteEvent } from '../../services/event-service';
 
 import { registerToEvent } from '../../services/registration-service';
-// + si tu as useAuth :
-import { useAuth } from '../../context/AuthContext'; // adapte le chemin
+import { useAuth } from '../../context/AuthContext'; 
 
 function EventDetails() {
   const { id } = useParams();
@@ -104,7 +103,7 @@ function EventDetails() {
 
       {successMsg && <p style={{ color: 'green' }}>{successMsg}</p>}
 
-      {/* 👤 ADMIN ACTIONS */}
+      {/* ADMIN ACTIONS */}
       {isAdmin && (
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center', margin: '12px 0' }}>
           <Link to={`/admin/events/${event.id}/edit`}>
@@ -133,14 +132,14 @@ function EventDetails() {
         </div>
       )}
 
-      {/* 👤 USER ACTION */}
+      {/* USER ACTION */}
       {isAuthenticated && !isAdmin && (
         <button type="button" onClick={handleRegister} disabled={registering}>
           {registering ? 'Inscription...' : "S'inscrire à cet événement"}
         </button>
       )}
 
-      {/* 👤 VISITEUR */}
+      {/* VISITEUR */}
       {!isAuthenticated && (
         <p style={{ fontStyle: 'italic' }}>Connectez-vous pour vous inscrire à cet événement.</p>
       )}

@@ -35,7 +35,7 @@ export async function fetchCategories() {
   return handleResponse(response);
 }
 
-// Fonctions admin (optionnelles pour plus tard)
+// Fonctions admin 
 export async function adminCreateCategory(payload) {
   const response = await fetch(`${API_URL}/admin/categories`, {
     method: 'POST',

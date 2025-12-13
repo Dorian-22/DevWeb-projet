@@ -4,7 +4,7 @@ const { sequelize } = require('../lib/db');
 const defineCategory = require('./category');
 const defineLocation = require('./location');
 const defineEvent = require('./event');
-const defineUser = require('./user');
+const defineUser = require('./user'); 
 
 const defineRegistration = require('./registration');
 

@@ -10,7 +10,7 @@ async function handleResponse(response) {
         errorMessage = data.error;
       }
     } catch (_) {
-      // ignore JSON parse error
+    
     }
     const error = new Error(errorMessage);
     error.status = response.status;

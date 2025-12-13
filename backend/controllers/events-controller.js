@@ -2,7 +2,7 @@
 const { Event, Category, Location } = require('../models');
 
 module.exports = {
-  // Liste publique (seulement les événements publiés)
+  
   list: async (req, res) => {
     try {
       console.log('Liste des événements publics');
@@ -11,7 +11,7 @@ module.exports = {
           { model: Category, as: 'category' },
           { model: Location, as: 'location' }
         ],
-        where: { status: 'published' } // IMPORTANT: seulement publiés
+        where: { status: 'published' } 
       });
       console.log(`${events.length} événements trouvés`);
       res.json(events);
