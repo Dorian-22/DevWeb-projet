@@ -39,6 +39,11 @@ Un composant générique de type tableau (GenericTable) est utilisé pour :
 - afficher les inscriptions d’un utilisateur
 - afficher les inscriptions à un événement (admin)
 
+## Répartition du travail
+- Dorian Perrot : Gestion des événements + Gestion Inscription et composant générique
+- Emmanuel-Leo Zhan : Authentification, rôles, sécurité
+
+
 ##  Lancer le projet
 
 ### Démarrage
