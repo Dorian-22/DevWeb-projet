@@ -17,7 +17,39 @@ async function handleResponse(response) {
   return response.json();
 }
 
+function getAuthHeaders() {
+  const token = localStorage.getItem('token');
+  const headers = {
+    'Content-Type': 'application/json'
+  };
+  
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  
+  return headers;
+}
+
 export async function fetchLocations() {
   const response = await fetch(`${API_URL}/locations`);
+  return handleResponse(response);
+}
+
+// Fonctions admin (optionnelles pour plus tard)
+export async function adminCreateLocation(payload) {
+  const response = await fetch(`${API_URL}/admin/locations`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(payload),
+  });
+  return handleResponse(response);
+}
+
+export async function adminUpdateLocation(id, payload) {
+  const response = await fetch(`${API_URL}/admin/locations/${id}`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(payload),
+  });
   return handleResponse(response);
 }

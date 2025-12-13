@@ -1,163 +1,126 @@
+// backend/controllers/events-controller.js
 const { Event, Category, Location } = require('../models');
 
-const eventsController = {
-  async list(req, res) {
+module.exports = {
+  // Liste publique (seulement les événements publiés)
+  list: async (req, res) => {
     try {
+      console.log('Liste des événements publics');
       const events = await Event.findAll({
         include: [
           { model: Category, as: 'category' },
-          { model: Location, as: 'location' },
+          { model: Location, as: 'location' }
         ],
-        order: [['startDate', 'ASC']],
+        where: { status: 'published' } // IMPORTANT: seulement publiés
       });
+      console.log(`${events.length} événements trouvés`);
       res.json(events);
     } catch (error) {
-      console.error('Error fetching events:', error);
-      res.status(500).json({ error: 'Failed to fetch events' });
+      console.error('Erreur liste events:', error);
+      res.status(500).json({ error: 'Erreur serveur' });
     }
   },
 
-  async getById(req, res) {
+  // Détail public
+  getById: async (req, res) => {
     try {
-      const { id } = req.params;
-      const event = await Event.findByPk(id, {
+      console.log(`Détail événement ID: ${req.params.id}`);
+      const event = await Event.findByPk(req.params.id, {
         include: [
           { model: Category, as: 'category' },
-          { model: Location, as: 'location' },
-        ],
+          { model: Location, as: 'location' }
+        ]
       });
-
+      
       if (!event) {
-        return res.status(404).json({ error: 'Event not found' });
-      }
-
-      res.json(event);
-    } catch (error) {
-      console.error('Error fetching event:', error);
-      res.status(500).json({ error: 'Failed to fetch event' });
-    }
-  },
-
-  async create(req, res) {
-    try {
-      const {
-        title,
-        description,
-        startDate,
-        endDate,
-        capacity,
-        status,
-        categoryId,
-        locationId,
-      } = req.body;
-
-    
-      if (!title || !startDate || !categoryId || !locationId) {
-        return res.status(400).json({
-          error: 'title, startDate, categoryId and locationId are required',
-        });
-      }
-
-      // Optionnel : vérifier que categoryId & locationId existent
-      const [category, location] = await Promise.all([
-        Category.findByPk(categoryId),
-        Location.findByPk(locationId),
-      ]);
-
-      if (!category) {
-        return res.status(400).json({ error: 'Invalid categoryId' });
-      }
-
-      if (!location) {
-        return res.status(400).json({ error: 'Invalid locationId' });
-      }
-
-      const event = await Event.create({
-        title,
-        description,
-        startDate,
-        endDate,
-        capacity,
-        status,
-        categoryId,
-        locationId,
-      });
-
-      res.status(201).json(event);
-    } catch (error) {
-      console.error('Error creating event:', error);
-      res.status(500).json({ error: 'Failed to create event' });
-    }
-  },
-
-  async update(req, res) {
-    try {
-      const { id } = req.params;
-      const {
-        title,
-        description,
-        startDate,
-        endDate,
-        capacity,
-        status,
-        categoryId,
-        locationId,
-      } = req.body;
-
-      const event = await Event.findByPk(id);
-
-      if (!event) {
-        return res.status(404).json({ error: 'Event not found' });
+        console.log(`Événement ${req.params.id} non trouvé`);
+        return res.status(404).json({ error: 'Événement non trouvé' });
       }
       
-      if (categoryId) {
-        const category = await Category.findByPk(categoryId);
-        if (!category) {
-          return res.status(400).json({ error: 'Invalid categoryId' });
-        }
-      }
-
-      if (locationId) {
-        const location = await Location.findByPk(locationId);
-        if (!location) {
-          return res.status(400).json({ error: 'Invalid locationId' });
-        }
-      }
-
-      await event.update({
-        title,
-        description,
-        startDate,
-        endDate,
-        capacity,
-        status,
-        categoryId,
-        locationId,
-      });
-
+      console.log(`Événement ${req.params.id} trouvé`);
       res.json(event);
     } catch (error) {
-      console.error('Error updating event:', error);
-      res.status(500).json({ error: 'Failed to update event' });
+      console.error('Erreur détail event:', error);
+      res.status(500).json({ error: 'Erreur serveur' });
     }
   },
 
-  async remove(req, res) {
+  // Création (admin seulement)
+  create: async (req, res) => {
     try {
-      const { id } = req.params;
-      const event = await Event.findByPk(id);
-
-      if (!event) {
-        return res.status(404).json({ error: 'Event not found' });
+      console.log('Création événement:', req.body);
+      
+      // Ajouter le createdBy si l'utilisateur est connecté
+      const eventData = req.body;
+      if (req.user) {
+        eventData.createdBy = req.user.id;
+        console.log(`Créé par user ID: ${req.user.id}`);
       }
+      
+      const event = await Event.create(eventData);
+      
+      // Retourner avec les relations
+      const eventWithRelations = await Event.findByPk(event.id, {
+        include: [
+          { model: Category, as: 'category' },
+          { model: Location, as: 'location' }
+        ]
+      });
+      
+      console.log(`Événement créé ID: ${event.id}`);
+      res.status(201).json(eventWithRelations);
+    } catch (error) {
+      console.error('Erreur création event:', error);
+      res.status(500).json({ error: 'Erreur serveur', details: error.message });
+    }
+  },
 
+  // Mise à jour (admin seulement)
+  update: async (req, res) => {
+    try {
+      console.log(`Mise à jour événement ID: ${req.params.id}`, req.body);
+      
+      const event = await Event.findByPk(req.params.id);
+      if (!event) {
+        console.log(`Événement ${req.params.id} non trouvé pour mise à jour`);
+        return res.status(404).json({ error: 'Événement non trouvé' });
+      }
+      
+      await event.update(req.body);
+      
+      // Retourner avec les relations
+      const updatedEvent = await Event.findByPk(event.id, {
+        include: [
+          { model: Category, as: 'category' },
+          { model: Location, as: 'location' }
+        ]
+      });
+      
+      console.log(`Événement ${req.params.id} mis à jour`);
+      res.json(updatedEvent);
+    } catch (error) {
+      console.error('Erreur mise à jour event:', error);
+      res.status(500).json({ error: 'Erreur serveur' });
+    }
+  },
+
+  // Suppression (admin seulement)
+  remove: async (req, res) => {
+    try {
+      console.log(`Suppression événement ID: ${req.params.id}`);
+      
+      const event = await Event.findByPk(req.params.id);
+      if (!event) {
+        console.log(`Événement ${req.params.id} non trouvé pour suppression`);
+        return res.status(404).json({ error: 'Événement non trouvé' });
+      }
+      
       await event.destroy();
+      console.log(`Événement ${req.params.id} supprimé`);
       res.status(204).send();
     } catch (error) {
-      console.error('Error deleting event:', error);
-      res.status(500).json({ error: 'Failed to delete event' });
+      console.error('Erreur suppression event:', error);
+      res.status(500).json({ error: 'Erreur serveur' });
     }
-  },
+  }
 };
-
-module.exports = eventsController;

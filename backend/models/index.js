@@ -1,14 +1,16 @@
-
+// backend/models/index.js
 const { sequelize } = require('../lib/db');
 
 const defineCategory = require('./category');
 const defineLocation = require('./location');
 const defineEvent = require('./event');
+const defineUser = require('./user'); // CORRIGÉ : './user' pas '/user'
 
 // Définition des modèles
 const Category = defineCategory(sequelize);
 const Location = defineLocation(sequelize);
 const Event = defineEvent(sequelize);
+const User = defineUser(sequelize);
 
 // Associations
 Category.hasMany(Event, {
@@ -47,12 +49,22 @@ Event.belongsTo(Location, {
   as: 'location',
 });
 
+User.hasMany(Event, {
+  as: 'createdEvents',
+  foreignKey: 'createdBy'
+});
+Event.belongsTo(User, {
+  as: 'createdByUser',
+  foreignKey: 'createdBy'
+});
+
 async function syncModels() {
   await sequelize.sync({ alter: true }); 
 }
 
 module.exports = {
   sequelize,
+  User,
   Category,
   Location,
   Event,
