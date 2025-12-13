@@ -6,11 +6,14 @@ const defineLocation = require('./location');
 const defineEvent = require('./event');
 const defineUser = require('./user'); // CORRIGÉ : './user' pas '/user'
 
+const defineRegistration = require('./registration');
+
 // Définition des modèles
 const Category = defineCategory(sequelize);
 const Location = defineLocation(sequelize);
 const Event = defineEvent(sequelize);
 const User = defineUser(sequelize);
+const Registration = defineRegistration(sequelize);
 
 // Associations
 Category.hasMany(Event, {
@@ -62,11 +65,35 @@ async function syncModels() {
   await sequelize.sync({ alter: true }); 
 }
 
+// Registration relations
+User.hasMany(Registration, { foreignKey: 'userId', as: 'registrations' });
+Registration.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+Event.hasMany(Registration, { foreignKey: 'eventId', as: 'registrations' });
+Registration.belongsTo(Event, { foreignKey: 'eventId', as: 'event' });
+
+// Many-to-many 
+User.belongsToMany(Event, {
+  through: Registration,
+  foreignKey: 'userId',
+  otherKey: 'eventId',
+  as: 'registeredEvents',
+});
+
+Event.belongsToMany(User, {
+  through: Registration,
+  foreignKey: 'eventId',
+  otherKey: 'userId',
+  as: 'registeredUsers',
+});
+
+
 module.exports = {
   sequelize,
   User,
   Category,
   Location,
   Event,
+  Registration,
   syncModels,
 };

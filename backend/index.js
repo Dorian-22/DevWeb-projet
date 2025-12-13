@@ -16,6 +16,11 @@ const adminEventsRouter = require('./routes/admin-events');
 const adminCategoriesRouter = require('./routes/admin-categories');
 const adminLocationsRouter = require('./routes/admin-locations');
 
+const registrationsRouter = require('./routes/registrations');
+const meRouter = require('./routes/me');
+const adminRegistrationsRouter = require('./routes/admin-registrations');
+
+
 const app = express();
 
 // Middleware
@@ -41,6 +46,13 @@ app.use('/locations', locationsRouter); // Routes GET publiques
 app.use('/admin/events', requireAuth, requireAdmin, adminEventsRouter);
 app.use('/admin/categories', requireAuth, requireAdmin, adminCategoriesRouter);
 app.use('/admin/locations', requireAuth, requireAdmin, adminLocationsRouter);
+
+
+app.use('/', registrationsRouter);     // POST /events/:id/register
+app.use('/me', meRouter);              // GET /me/registrations
+
+app.use('/admin', requireAuth, requireAdmin, adminRegistrationsRouter);
+// => GET /admin/events/:id/registrations
 
 // Route de test
 app.get('/', (req, res) => {

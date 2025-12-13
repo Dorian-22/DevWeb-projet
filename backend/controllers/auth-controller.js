@@ -33,9 +33,12 @@ module.exports = {
         role: user.role
       });
 
+      const userResponse = user.get({ plain: true });
+      delete userResponse.passwordHash;
+
       res.status(201).json({
         message: 'Utilisateur créé avec succès',
-        user,
+        user: userResponse,
         token
       });
 

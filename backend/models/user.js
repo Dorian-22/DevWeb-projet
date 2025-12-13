@@ -12,8 +12,9 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
-      validate: {
-        isEmail: true
+      validate: { isEmail: true },
+      set(value) {
+        this.setDataValue('email', value.trim().toLowerCase());
       }
     },
     passwordHash: {
@@ -23,6 +24,7 @@ module.exports = (sequelize) => {
     },
     role: {
       type: DataTypes.ENUM('USER', 'ADMIN'),
+      allowNull: false,
       defaultValue: 'USER'
     },
     firstName: {
@@ -40,12 +42,12 @@ module.exports = (sequelize) => {
     timestamps: true,
     underscored: true, // Pour la convention snake_case
     defaultScope: {
-      attributes: { exclude: ['password_hash'] }
+      attributes: { exclude: ['passwordHash'] }
     }
   });
 
   User.addScope('withPassword', {
-    attributes: { include: ['password_hash'] }
+    attributes: { include: ['passwordHash'] }
   });
 
   return User;

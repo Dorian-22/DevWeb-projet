@@ -1,12 +1,14 @@
-// src/views/events/EventsList.jsx
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { fetchEvents } from '../../services/event-service';
+import GenericTable from '../../components/GenericTable';
 
 function EventsList() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function loadEvents() {
@@ -16,7 +18,7 @@ function EventsList() {
         const data = await fetchEvents();
         setEvents(data);
       } catch (err) {
-        console.error('Error loading events:', err);
+        console.error(err);
         setError(err.message || 'Failed to load events');
       } finally {
         setLoading(false);
@@ -26,53 +28,42 @@ function EventsList() {
     loadEvents();
   }, []);
 
-  if (loading) {
-    return <p>Chargement des événements...</p>;
-  }
+  if (loading) return <p>Chargement des événements...</p>;
+  if (error) return <p style={{ color: 'red' }}>Erreur : {error}</p>;
+  if (!events.length) return <p>Aucun événement disponible.</p>;
 
-  if (error) {
-    return <p style={{ color: 'red' }}>Erreur : {error}</p>;
-  }
-
-  if (!events.length) {
-    return <p>Aucun événement disponible pour le moment.</p>;
-  }
+  const columns = [
+    { key: 'title', header: 'Titre' },
+    {
+      key: 'category',
+      header: 'Catégorie',
+      render: (e) => e.category?.name || '-',
+    },
+    {
+      key: 'location',
+      header: 'Lieu',
+      render: (e) => (e.location ? `${e.location.name} (${e.location.city})` : '-'),
+    },
+    {
+      key: 'startDate',
+      header: 'Début',
+      render: (e) => (e.startDate ? new Date(e.startDate).toLocaleString() : '-'),
+    },
+    {
+      key: 'status',
+      header: 'Statut',
+      render: (e) => e.status,
+    },
+  ];
 
   return (
     <div>
-      <h1>Liste des événements</h1>
-      <ul style={{ listStyle: 'none', padding: 0 }}>
-        {events.map((event) => (
-          <li
-            key={event.id}
-            style={{
-              border: '1px solid #ddd',
-              borderRadius: '8px',
-              padding: '12px',
-              marginBottom: '10px',
-            }}
-          >
-            <h2 style={{ margin: '0 0 8px' }}>
-              <Link to={`/events/${event.id}`}>{event.title}</Link>
-            </h2>
-            {event.category && (
-              <p style={{ margin: '0 0 4px', fontStyle: 'italic' }}>
-                Catégorie : {event.category.name}
-              </p>
-            )}
-            {event.location && (
-              <p style={{ margin: '0 0 4px' }}>
-                Lieu : {event.location.name} ({event.location.city})
-              </p>
-            )}
-            {event.startDate && (
-              <p style={{ margin: 0 }}>
-                Début : {new Date(event.startDate).toLocaleString()}
-              </p>
-            )}
-          </li>
-        ))}
-      </ul>
+      <h1>Événements</h1>
+      <GenericTable
+        columns={columns}
+        data={events}
+        onRowClick={(row) => navigate(`/events/${row.id}`)}
+      />
     </div>
   );
 }
