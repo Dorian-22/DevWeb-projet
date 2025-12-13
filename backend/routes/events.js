@@ -1,3 +1,4 @@
+// backend/routes/events.js
 const express = require('express');
 const eventsController = require('../controllers/events-controller');
 
@@ -9,13 +10,7 @@ router.get('/', eventsController.list);
 // Détail d'un événement
 router.get('/:id', eventsController.getById);
 
-// Création d'un événement -> admin après
-router.post('/', eventsController.create);
-
-// Mise à jour d'un événement
-router.put('/:id', eventsController.update);
-
-// Suppression d'un événement
-router.delete('/:id', eventsController.remove);
+// SUPPRIMER create, update, delete ici
+// Ces routes sont dans admin-events.js seulement
 
 module.exports = router;

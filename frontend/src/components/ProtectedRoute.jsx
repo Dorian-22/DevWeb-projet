@@ -1,11 +1,35 @@
-import React, { useContext } from 'react';
+// frontend/src/components/ProtectedRoute.jsx
 import { Navigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 
-export default function ProtectedRoute({ children, role }) {
-  const { user, loading } = useContext(AuthContext);
-  if (loading) return null; // ou un loader
-  if (!user) return <Navigate to="/login" replace />;
-  if (role && user.role !== role) return <Navigate to="/unauthorized" replace />;
+export const ProtectedRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <div>Chargement...</div>;
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
   return children;
-}
+};
+
+export const AdminRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <div>Chargement...</div>;
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (user.role !== 'ADMIN') {
+    return <Navigate to="/events" replace />;
+  }
+
+  return children;
+};

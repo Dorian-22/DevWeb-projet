@@ -1,5 +1,4 @@
 // src/services/event-service.js
-
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 async function handleResponse(response) {
@@ -30,13 +29,18 @@ export async function fetchEventById(id) {
   return handleResponse(response);
 }
 
-
-// plus tard :  vrai token JWT
+// MAINTENANT : vrai token JWT
 function getAuthHeaders() {
-  return {
-    // Exemple: Authorization: `Bearer ${localStorage.getItem('token')}`,
-    'Content-Type': 'application/json',
+  const token = localStorage.getItem('token');
+  const headers = {
+    'Content-Type': 'application/json'
   };
+  
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  
+  return headers;
 }
 
 export async function adminCreateEvent(payload) {
@@ -63,7 +67,6 @@ export async function adminDeleteEvent(id) {
     headers: getAuthHeaders(),
   });
 
-  // DELETE 204 => pas de JSON à parser
   if (!response.ok) {
     let errorMessage = 'Request failed';
     try {

@@ -3,6 +3,10 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { fetchEventById, adminDeleteEvent } from '../../services/event-service';
 
+import { registerToEvent } from '../../services/registration-service';
+// + si tu as useAuth :
+import { useAuth } from '../../context/AuthContext'; // adapte le chemin
+
 function EventDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -11,6 +15,16 @@ function EventDetails() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [deleting, setDeleting] = useState(false);
+
+  
+  const [registering, setRegistering] = useState(false);
+  const [successMsg, setSuccessMsg] = useState(null);
+
+  const { user, isAuthenticated, isAdmin } = useAuth();
+
+ 
+
+
 
   useEffect(() => {
     async function loadEvent() {
@@ -65,6 +79,21 @@ function EventDetails() {
         }
     }
 
+    async function handleRegister() {
+      try {
+        setRegistering(true);
+        setSuccessMsg(null);
+        setError(null);
+        await registerToEvent(id);
+        setSuccessMsg(" Inscription réussie !");
+      } catch (err) {
+        setError(err.message || "Impossible de s'inscrire");
+      } finally {
+        setRegistering(false);
+      }
+    }
+
+
   return (
     <div>
       <p>
@@ -73,21 +102,49 @@ function EventDetails() {
 
       <h1>{event.title}</h1>
 
-      <p>
-        {/* Plus tard -> pour le rôle ADMIN */}
-        <Link to={`/admin/events/${event.id}/edit`}>Modifier cet événement (admin)</Link>
+      {successMsg && <p style={{ color: 'green' }}>{successMsg}</p>}
 
+      {/* 👤 ADMIN ACTIONS */}
+      {isAdmin && (
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', margin: '12px 0' }}>
+          <Link to={`/admin/events/${event.id}/edit`}>
+            <button type="button">Modifier</button>
+          </Link>
 
-        {/* Bouton supprimer */}
-        <button
-          type="button"
-          onClick={handleDelete}
-          disabled={deleting}
-          style={{ backgroundColor: '#c0392b', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer' }}
-        >
-          {deleting ? 'Suppression...' : 'Supprimer cet événement'}
+          <Link to={`/admin/events/${event.id}/registrations`}>
+            <button type="button">Voir inscriptions</button>
+          </Link>
+
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={deleting}
+            style={{
+              backgroundColor: '#c0392b',
+              color: 'white',
+              border: 'none',
+              padding: '6px 12px',
+              borderRadius: '4px',
+              cursor: 'pointer',
+            }}
+          >
+            {deleting ? 'Suppression...' : 'Supprimer'}
+          </button>
+        </div>
+      )}
+
+      {/* 👤 USER ACTION */}
+      {isAuthenticated && !isAdmin && (
+        <button type="button" onClick={handleRegister} disabled={registering}>
+          {registering ? 'Inscription...' : "S'inscrire à cet événement"}
         </button>
-      </p>
+      )}
+
+      {/* 👤 VISITEUR */}
+      {!isAuthenticated && (
+        <p style={{ fontStyle: 'italic' }}>Connectez-vous pour vous inscrire à cet événement.</p>
+      )}
+
 
       {error && (
         <p style={{ color: 'red' }}>
