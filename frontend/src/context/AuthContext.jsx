@@ -52,7 +52,6 @@ export const AuthProvider = ({ children }) => {
     setUser(data.user);
     setToken(data.token);
     return data;
->>>>>>> Dev_Dorian
   };
 
   const logout = () => {
