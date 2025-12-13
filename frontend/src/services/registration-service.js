@@ -12,7 +12,7 @@ async function handleResponse(response) {
     err.status = response.status;
     throw err;
   }
-  // certains endpoints DELETE peuvent être 204 => pas de json
+  
   try {
     return await response.json();
   } catch {
@@ -21,7 +21,7 @@ async function handleResponse(response) {
 }
 
 function getAuthHeaders() {
-  // si A stocke token ailleurs, adapte
+ 
   const token = localStorage.getItem('token');
   const headers = { 'Content-Type': 'application/json' };
   if (token) headers.Authorization = `Bearer ${token}`;
@@ -45,6 +45,14 @@ export async function fetchMyRegistrations() {
 
 export async function fetchEventRegistrationsAdmin(eventId) {
   const res = await fetch(`${API_URL}/admin/events/${eventId}/registrations`, {
+    headers: getAuthHeaders(),
+  });
+  return handleResponse(res);
+}
+
+export async function unregisterFromEvent(eventId) {
+  const res = await fetch(`${API_URL}/events/${eventId}/register`, {
+    method: 'DELETE',
     headers: getAuthHeaders(),
   });
   return handleResponse(res);

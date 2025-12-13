@@ -18,7 +18,7 @@ const registrationsController = {
         return res.status(409).json({ error: 'Already registered to this event' });
       }
 
-      // 2) Capacité max (si capacity est définie)
+      // 2) Capacité max 
       if (event.capacity != null) {
         const count = await Registration.count({
           where: { eventId, status: 'REGISTERED' },
@@ -98,6 +98,26 @@ const registrationsController = {
       res.status(500).json({ error: 'Failed to fetch event registrations' });
     }
   },
+  // DELETE /events/:id/register
+  async unregisterFromEvent(req, res) {
+    try {
+        const userId = req.user.id;
+        const eventId = Number(req.params.id);
+
+        const registration = await Registration.findOne({ where: { userId, eventId } });
+
+        if (!registration || registration.status !== 'REGISTERED') {
+        return res.status(404).json({ error: 'No active registration found' });
+        }
+
+        await registration.update({ status: 'CANCELLED' });
+        return res.status(200).json({ message: 'Unregistered successfully' });
+    } catch (error) {
+        console.error('Error unregistering:', error);
+        return res.status(500).json({ error: 'Failed to unregister' });
+    }
+  }
+
 };
 
 module.exports = registrationsController;

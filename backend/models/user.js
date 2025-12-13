@@ -20,7 +20,7 @@ module.exports = (sequelize) => {
     passwordHash: {
       type: DataTypes.STRING,
       allowNull: false,
-      field: 'password_hash' // Pour correspondre à ta convention
+      field: 'password_hash' 
     },
     role: {
       type: DataTypes.ENUM('USER', 'ADMIN'),
@@ -40,7 +40,7 @@ module.exports = (sequelize) => {
   }, {
     tableName: 'users',
     timestamps: true,
-    underscored: true, // Pour la convention snake_case
+    underscored: true, 
     defaultScope: {
       attributes: { exclude: ['passwordHash'] }
     }

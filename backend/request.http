@@ -49,19 +49,7 @@ GET http://localhost:3000/locations
 ### liste catégorie
 GET http://localhost:3000/categories
 
-
-### Créer une catégorie
-POST http://localhost:3000/admin/categories
-Content-Type: application/json
-
-{
-  "name": "Atelier",
-  "description": "Événements de type atelier"
-}
-
-
-
-
+###
 
 
 
@@ -131,3 +119,8 @@ PUT http://localhost:3000/admin/events/9999
 
 ### liste inscrit 
 GET http://localhost:3000/admin/events/1/registrations
+
+
+
+
+

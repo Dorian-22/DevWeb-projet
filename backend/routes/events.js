@@ -10,7 +10,6 @@ router.get('/', eventsController.list);
 // Détail d'un événement
 router.get('/:id', eventsController.getById);
 
-// SUPPRIMER create, update, delete ici
-// Ces routes sont dans admin-events.js seulement
+
 
 module.exports = router;

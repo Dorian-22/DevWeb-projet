@@ -9,9 +9,9 @@ const { requireAuth, requireAdmin } = require('./middlewares/auth');
 
 // Routes
 const authRouter = require('./routes/auth');
-const eventsRouter = require('./routes/events'); // AJOUTÉ
-const categoriesRouter = require('./routes/categories'); // AJOUTÉ
-const locationsRouter = require('./routes/locations'); // AJOUTÉ
+const eventsRouter = require('./routes/events');
+const categoriesRouter = require('./routes/categories'); 
+const locationsRouter = require('./routes/locations'); 
 const adminEventsRouter = require('./routes/admin-events');
 const adminCategoriesRouter = require('./routes/admin-categories');
 const adminLocationsRouter = require('./routes/admin-locations');
