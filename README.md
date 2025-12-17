@@ -42,6 +42,7 @@ Un composant générique de type tableau (GenericTable) est utilisé pour :
 ## Répartition du travail
 - Dorian Perrot : Gestion des événements + Gestion Inscription et composant générique
 - Emmanuel-Leo Zhan : Authentification, rôles, sécurité
+Avec l'aide de Steeven Lepembe.
 
 
 ##  Lancer le projet
